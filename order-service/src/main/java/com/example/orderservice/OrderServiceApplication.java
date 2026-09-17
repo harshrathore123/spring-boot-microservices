@@ -12,8 +12,7 @@ public class OrderServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(OrderServiceApplication.class, args);
-	}
-	
+	}	
 	/** Creating Bean for RestTemplate **/
 //	@Bean
 //	public RestTemplate restTemplate() {
@@ -25,5 +24,4 @@ public class OrderServiceApplication {
 //	public WebClient webClient() {
 //		return WebClient.builder().build();
 //	}
-
 }

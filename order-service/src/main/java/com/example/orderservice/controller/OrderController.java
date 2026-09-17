@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.orderservice.dto.OrderResponse;
+import com.example.orderservice.dto.ProductDto;
 import com.example.orderservice.dto.UserDto;
 import com.example.orderservice.entity.Order;
 import com.example.orderservice.service.OrderService;
@@ -75,6 +77,18 @@ public class OrderController {
     public ResponseEntity<UserDto> getUser(@PathVariable Integer userId){
     	UserDto user = orderService.getUserById(userId);
     	return ResponseEntity.ok(user);
+    }
+    
+    @GetMapping("/products/{prodId}")
+    public ResponseEntity<ProductDto> getProduct(@PathVariable Integer prodId){
+    	ProductDto product = orderService.getProductById(prodId);
+    	return ResponseEntity.ok(product);
+    }
+    
+    @GetMapping("/{id}/details")
+    public ResponseEntity<OrderResponse> getOrderDetails(@PathVariable("id") Integer id){
+    	OrderResponse response = orderService.getOrderDetailsById(id);
+    	return ResponseEntity.ok(response);
     }
     
 }

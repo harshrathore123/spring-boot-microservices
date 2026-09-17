@@ -2,6 +2,8 @@ package com.example.orderservice.service;
 
 import java.util.List;
 
+import com.example.orderservice.dto.OrderResponse;
+import com.example.orderservice.dto.ProductDto;
 import com.example.orderservice.dto.UserDto;
 import com.example.orderservice.entity.Order;
 
@@ -18,4 +20,8 @@ public interface OrderService {
     void deleteOrder(Integer id);
     
     UserDto getUserById(Integer userId);
+    
+    ProductDto getProductById(Integer prodId);
+    
+    OrderResponse getOrderDetailsById(Integer id);
 }

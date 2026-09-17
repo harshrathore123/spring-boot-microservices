@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 //import org.springframework.web.client.RestTemplate;
 //import org.springframework.web.reactive.function.client.WebClient;
 
+import com.example.orderservice.client.ProductClient;
 import com.example.orderservice.client.UserClient;
+import com.example.orderservice.dto.OrderResponse;
+import com.example.orderservice.dto.ProductDto;
 import com.example.orderservice.dto.UserDto;
 import com.example.orderservice.entity.Order;
 import com.example.orderservice.repository.OrderRepository;
@@ -14,76 +17,98 @@ import com.example.orderservice.repository.OrderRepository;
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    private final OrderRepository orderRepository;
+	private final OrderRepository orderRepository;
 //    private final RestTemplate restTemplate;
 //    private final WebClient webClient;
-    private final UserClient userClient;
+	private final UserClient userClient;
+	private final ProductClient productClient;
 
-    public OrderServiceImpl(OrderRepository orderRepository,UserClient userClient) {
-        this.orderRepository = orderRepository;
-        this.userClient = userClient;
-    }
+	public OrderServiceImpl(OrderRepository orderRepository, UserClient userClient, ProductClient productClient) {
+		this.orderRepository = orderRepository;
+		this.userClient = userClient;
+		this.productClient = productClient;
+	}
 
-    @Override
-    public Order createOrder(Order order) {
-        return orderRepository.save(order);
-    }
+	@Override
+	public Order createOrder(Order order) {
+		return orderRepository.save(order);
+	}
 
-    @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
+	@Override
+	public List<Order> getAllOrders() {
+		return orderRepository.findAll();
+	}
 
-    @Override
-    public Order getOrderById(Integer id) {
-        return orderRepository.findById(id).orElse(null);
-    }
+	@Override
+	public Order getOrderById(Integer id) {
+		return orderRepository.findById(id).orElse(null);
+	}
 
-    @Override
-    public Order updateOrder(Integer id, Order order) {
+	@Override
+	public Order updateOrder(Integer id, Order order) {
 
-        Order existingOrder =
-                orderRepository.findById(id).orElse(null);
+		Order existingOrder = orderRepository.findById(id).orElse(null);
 
-        if (existingOrder == null) {
-            return null;
-        }
+		if (existingOrder == null) {
+			return null;
+		}
 
-        existingOrder.setUserId(order.getUserId());
-        existingOrder.setProductId(order.getProductId());
-        existingOrder.setQuantity(order.getQuantity());
-        existingOrder.setTotalPrice(order.getTotalPrice());
+		existingOrder.setUserId(order.getUserId());
+		existingOrder.setProductId(order.getProductId());
+		existingOrder.setQuantity(order.getQuantity());
+		existingOrder.setTotalPrice(order.getTotalPrice());
 
-        return orderRepository.save(existingOrder);
-    }
+		return orderRepository.save(existingOrder);
+	}
 
-    @Override
-    public void deleteOrder(Integer id) {
-        orderRepository.deleteById(id);
-    }
+	@Override
+	public void deleteOrder(Integer id) {
+		orderRepository.deleteById(id);
+	}
 
-    /** This is for restTemplate **/
-    /**
-    public UserDto getUserById(Integer userId) {
-    	String url = "http://localhost:8081/users/" + userId;
-    	return restTemplate.getForObject(url, UserDto.class);
-    }
-    **/
-    
-    /** This is for webClient **/
-    /**
-    public UserDto getUserById(Integer userId) {
-    	return webClient
-    			.get()
-    			.uri("http://localhost:8081/users/" + userId)
-    			.retrieve()
-    			.bodyToMono(UserDto.class)
-    			.block();
-    }
-    **/
-    
-    /** This is for UserClient **/
-    public UserDto getUserById(Integer userId) {
-    	return userClient.getUserById(userId);
-    }
+	/** This is for restTemplate **/
+	/**
+	 * public UserDto getUserById(Integer userId) { String url =
+	 * "http://localhost:8081/users/" + userId; return
+	 * restTemplate.getForObject(url, UserDto.class); }
+	 **/
+
+	/** This is for webClient **/
+	/**
+	 * public UserDto getUserById(Integer userId) { return webClient .get()
+	 * .uri("http://localhost:8081/users/" + userId) .retrieve()
+	 * .bodyToMono(UserDto.class) .block(); }
+	 **/
+
+	/** This is for UserClient **/
+	public UserDto getUserById(Integer userId) {
+		return userClient.getUserById(userId);
+	}
+
+	public ProductDto getProductById(Integer prodId) {
+		return productClient.getProductById(prodId);
+	}
+
+	public OrderResponse getOrderDetailsById(Integer id) {
+		Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+
+		UserDto user = userClient.getUserById(order.getUserId());
+		ProductDto product = productClient.getProductById(order.getProductId());
+		OrderResponse response = new OrderResponse();
+
+		response.setOrderId(order.getId());
+
+		response.setUserId(user.getId());
+		response.setUserName(user.getName());
+		response.setUserEmail(user.getEmail());
+
+		response.setProductId(product.getId());
+		response.setProductName(product.getName());
+		response.setProductPrice(product.getPrice());
+
+		response.setQuantity(order.getQuantity());
+		response.setTotalPrice(order.getTotalPrice());
+
+		return response;
+	}
 }
