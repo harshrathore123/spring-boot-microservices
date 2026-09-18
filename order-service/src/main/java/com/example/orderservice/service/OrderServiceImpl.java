@@ -12,6 +12,7 @@ import com.example.orderservice.dto.OrderResponse;
 import com.example.orderservice.dto.ProductDto;
 import com.example.orderservice.dto.UserDto;
 import com.example.orderservice.entity.Order;
+import com.example.orderservice.exception.ProductNotFoundException;
 import com.example.orderservice.exception.UserNotFoundException;
 import com.example.orderservice.repository.OrderRepository;
 
@@ -96,7 +97,14 @@ public class OrderServiceImpl implements OrderService {
 	}	
 
 	public ProductDto getProductById(Integer prodId) {
-		return productClient.getProductById(prodId);
+		try {
+			return productClient.getProductById(prodId);
+		}
+		catch(FeignException.NotFound e) {
+			throw new ProductNotFoundException(
+					"Product not found with ID: " + prodId
+			);
+		}
 	}
 
 	public OrderResponse getOrderDetailsById(Integer id) {
