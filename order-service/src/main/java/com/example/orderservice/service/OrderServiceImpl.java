@@ -12,7 +12,10 @@ import com.example.orderservice.dto.OrderResponse;
 import com.example.orderservice.dto.ProductDto;
 import com.example.orderservice.dto.UserDto;
 import com.example.orderservice.entity.Order;
+import com.example.orderservice.exception.UserNotFoundException;
 import com.example.orderservice.repository.OrderRepository;
+
+import feign.FeignException;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -82,8 +85,15 @@ public class OrderServiceImpl implements OrderService {
 
 	/** This is for UserClient **/
 	public UserDto getUserById(Integer userId) {
-		return userClient.getUserById(userId);
-	}
+		try {
+			return userClient.getUserById(userId);
+		}
+		catch(FeignException.NotFound e) {
+			throw new UserNotFoundException(
+	                "User not found with ID: " + userId
+	        );
+		}
+	}	
 
 	public ProductDto getProductById(Integer prodId) {
 		return productClient.getProductById(prodId);
@@ -92,8 +102,8 @@ public class OrderServiceImpl implements OrderService {
 	public OrderResponse getOrderDetailsById(Integer id) {
 		Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
 
-		UserDto user = userClient.getUserById(order.getUserId());
-		ProductDto product = productClient.getProductById(order.getProductId());
+		UserDto user = getUserById(order.getUserId());
+		ProductDto product = getProductById(order.getProductId());
 		OrderResponse response = new OrderResponse();
 
 		response.setOrderId(order.getId());
