@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.orderservice.dto.UserDto;
 
-@FeignClient(name = "user-service", url = "http://localhost:8081")
+@FeignClient(name = "user-service")
 public interface UserClient {
 
     @GetMapping("/users/{id}")
