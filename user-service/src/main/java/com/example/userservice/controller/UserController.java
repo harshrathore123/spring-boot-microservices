@@ -28,17 +28,17 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-
-        User user = userService.getUserById(id);
-
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(user);
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
+//
+//        User user = userService.getUserById(id);
+//
+//        if (user == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseEntity.ok(user);
+//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(
@@ -60,5 +60,20 @@ public class UserController {
         userService.deleteUser(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(
+            @PathVariable Integer id,
+            @RequestHeader(value = "X-Gateway", required = false) String gateway,
+            @RequestHeader(value = "X-Test-Header", required = false) String testHeader
+    ) {
+
+        User user = userService.getUserById(id);
+
+        System.out.println("X-Gateway Header = " + gateway);
+        System.out.println("X-Test-Header = " + testHeader);
+
+        return ResponseEntity.ok(user);
     }
 }
